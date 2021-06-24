@@ -1,5 +1,5 @@
 # GRaWD_ICCV21_Review
-- Imaginative Walks: Generative Random Walk Deviation Loss for Improved Unseen Learning Representation Example Code - For ICCV21 Review Only.
+- Imaginative Walks: Generative Random Walk Deviation Loss for Improved Unseen Learning Representation Example Code.
 
 - We provide the example code to reproduce the results for GAZSL+GRaWD on all textual-based datasets (i.e., CUB-wiki/NAB-wiki hard/easy splits.)
 
@@ -27,3 +27,5 @@ python train.py --dataset NAB --splitmode hard --exp_name 'NAB_hard_Rep' --rw_co
 ```
 
 Here we provide the potential best hyper-parameters that can reproduce our reported results. You can refer to the logs under main folder for the training details. For each trial, the final performance may vary a little bit. Following standard setting, we report the best performance after k-trials. 
+
+We're still cleaning the code and will provide the hyperparameter search scripts to investigate more on GRaWD.
