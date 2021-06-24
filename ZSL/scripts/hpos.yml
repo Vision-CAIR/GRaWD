@@ -1,0 +1,47 @@
+nab_hard_big_hpo:
+  search_type: "random"
+  num_experiments: 100
+  grid:
+    rw_params|class_visit_loss_coef: [0.1, 0.5]
+    loss_weights|gen|creative: [0.01, 0.1, 1.0, 2.5]
+    loss_weights|gen|imitative: [0.01, 0.1, 1.0, 2.5]
+    grad_clip_value: [-1.0, 5.0, 10.0, 50.0, 100.0]
+    loss_weights|discr|real: [0.001, 0.01, 0.1, 1.0, 2.5]
+    loss_weights|discr|imitative: [0.001, 0.01, 0.1, 1.0, 2.5]
+    rw_params|dot_product_scale: [1.0, 2.5, 5.0]
+    lr: [0.00005, 0.0001, 0.0002, 0.0005, 0.001]
+    rw_params|space: ["feature", "image"]
+    rw_params|similarity_measure: ["dot_product", "l2_distance"]
+
+no_visit_loss:
+  search_type: "random"
+  num_experiments: 20
+  grid:
+    loss_weights|visit_loss: [0.0]
+    rw_params|class_visit_loss_coef: [0.1, 0.5]
+    loss_weights|gen|creative: [0.01, 0.1, 1.0, 2.5]
+    loss_weights|gen|imitative: [0.01, 0.1, 1.0, 2.5]
+    grad_clip_value: [-1.0, 5.0, 10.0, 50.0, 100.0]
+    loss_weights|discr|real: [0.001, 0.01, 0.1, 1.0, 2.5]
+    loss_weights|discr|imitative: [0.001, 0.01, 0.1, 1.0, 2.5]
+    rw_params|dot_product_scale: [1.0, 2.5, 5.0]
+    lr: [0.00005, 0.0001, 0.0002, 0.0005, 0.001]
+    rw_params|space: ["feature", "image"]
+    rw_params|similarity_measure: ["dot_product", "l2_distance"]
+
+
+learnable_alpha:
+  search_type: "random"
+  num_experiments: 10
+  grid:
+    rw_params|learnable_alpha: [true]
+    rw_params|num_steps: [25]
+    rw_params|class_visit_loss_coef: [0.1, 0.5]
+    loss_weights|gen|creative: [0.01, 0.1, 1.0, 2.5]
+    loss_weights|gen|imitative: [0.01, 0.1, 1.0, 2.5]
+    grad_clip_value: [-1.0, 5.0, 10.0, 50.0, 100.0]
+    loss_weights|discr|real: [0.001, 0.01, 0.1, 1.0, 2.5]
+    loss_weights|discr|imitative: [0.001, 0.01, 0.1, 1.0, 2.5]
+    rw_params|dot_product_scale: [1.0, 2.5, 5.0]
+    lr: [0.00005, 0.0001, 0.0002, 0.0005, 0.001]
+    rw_params|similarity_measure: ["dot_product"]
