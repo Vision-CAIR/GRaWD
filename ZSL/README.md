@@ -1,4 +1,4 @@
-# GRaWD_ICCV21_Review
+# GRaWD ZSL
 - Imaginative Walks: Generative Random Walk Deviation Loss for Improved Unseen Learning Representation Example Code.
 
 - We provide the example code to reproduce the results for GAZSL+GRaWD on all textual-based datasets (i.e., CUB-wiki/NAB-wiki hard/easy splits.)
