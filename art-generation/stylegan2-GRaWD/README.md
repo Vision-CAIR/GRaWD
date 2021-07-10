@@ -10,7 +10,7 @@ I have tested on:
 
 ## Usage
 
-First download the wikiart dataset from here: 
+First download the wikiart dataset from [here](https://www.dropbox.com/s/ssw0fdcdld50o1g/wikiartimages.zip/)
 
 Extract the data in the root directory.
 
