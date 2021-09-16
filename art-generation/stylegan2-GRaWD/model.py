@@ -691,7 +691,7 @@ class Discriminator(nn.Module):
 
         if return_features:
             if type(out) is list:
-                out += features
+                out += [features]
             else:
                 out = [out, features]
             

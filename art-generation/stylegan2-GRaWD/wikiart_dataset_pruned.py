@@ -43,73 +43,93 @@ gauss_filt = transforms.Compose([GaussFilt(),
                                   transforms.ToPILImage()
                                  ])     
 
-class wikiart_dataset_pruned(Dataset):
-    def __init__(self, opt, transform=None, pruned_file='groundtruth_pruned.mat'):
+class wikiart_dataset_HR(Dataset):
+    def __init__(self, opt, transform=None, root='./wikiart/images'):
 
-        self.root = '/tmp/wikiart_data/images' #wikiartimages.zip unzipped
-        
-        self.mat = scipy.io.loadmat(pruned_file)
-        self.pruned_filenames = self.mat['groundtruth_pruned'][0][0][0]
-        self.pruned_style_class = self.mat['groundtruth_pruned'][0][0][1]
-        self.pruned_genre = self.mat['groundtruth_pruned'][0][0][2]
-        self.pruned_artist = self.mat['groundtruth_pruned'][0][0][3]
-        self.artist_to_label = {a:l for l,a in enumerate(np.unique(self.pruned_artist))}
+        self.root = root #wikiartimages.zip unzipped
+        self.images = []
+        self.class_count = {}
+        self.root = self.root
+        self.classes  = [
+            art_style_name
+            for art_style_name in os.listdir(self.root)
+            if os.path.isdir(os.path.join(self.root, art_style_name))
+        ]
 
-        opt.n_styles = len(np.unique(self.pruned_style_class))
-        opt.n_genres = len(np.unique(self.pruned_genre))
-        opt.n_artists = len(np.unique(self.pruned_artist))
+        self.classes_to_num = {}
+        for (i,x) in enumerate(self.classes):
+            self.classes_to_num[x] = i 
 
-        print('wikiart dataset contains %d images'%(len(self.pruned_filenames)))
-        print('wikiart dataset contains %s art_styles'%(len(np.unique(self.pruned_style_class))))
-        print('wikiart dataset contains %s genres'%(len(np.unique(self.pruned_genre))))
-        print('wikiart dataset contains %s artists'%(len(np.unique(self.pruned_artist))))
+        self.pruned_style_class = []
+        for art_style in self.classes:
+            
+            count = 0
+            for img_name in os.listdir(os.path.join(self.root, art_style)):
+                if is_img(img_name):
+                    fullpath = os.path.join(self.root, art_style, img_name)
+                    self.images.append(WikiartImage(img_name, art_style, fullpath, self.classes_to_num[art_style]))
+                    self.pruned_style_class.append([self.classes_to_num[art_style]])
+                    count += 1
+            self.class_count[art_style] = count
+            print(art_style, len(os.listdir(os.path.join(self.root, art_style))))            
+
+        opt.n_styles = len(self.classes)
+        # No genre or style info is present, but setting to 1
+        # so that it doesn't error out
+        opt.n_genres = 1
+        opt.n_artists = 1
+        # opt.n_genres = len(np.unique(self.pruned_genre))
+        # opt.n_artists = len(np.unique(self.pruned_artist))
+
+        print('wikiart dataset contains %s art_styles'%(len(self.classes)))
 
         if opt.data_aug == 'matlab':
             print("Data Augmentation Used: ", opt.data_aug)
+            # 50% time no aug, and 50% time one of the first four.
             self.additional_tfms = [gauss_tfm, speckle_tfm, poisson_tfm, gauss_filt, None, None, None, None]       
 
         self.opt = opt
 
     def __getitem__(self, index):
-
+        
         self.transform = transforms.Compose([
             transforms.Resize((self.resolution,self.resolution), Image.BICUBIC),
-            transforms.CenterCrop(self.resolution),
+            # transforms.CenterCrop(self.resolution),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5),
-                                    (0.5, 0.5, 0.5))
+                                 (0.5, 0.5, 0.5))
         ])
 
-        wikiartimage_path = os.path.join(self.root, self.pruned_filenames[index][0][0])      
+        art_image = self.images[index]
+        wikiartimage_path = art_image.path #os.path.join(self.root, self.pruned_filenames[index][0][0])
+        wp = Path(wikiartimage_path)
+        wikiartimage_path = os.path.join(self.root, wp.parents[0].name, wp.name)
+
         
         inputs = {}
         img = Image.open(wikiartimage_path).convert('RGB')
 
         if self.opt.data_aug == 'matlab':
             tfm_id = random.randint(0, len(self.additional_tfms)-1)
-            if tfm_id != len(self.additional_tfms) - 1:
-                # print('applying' , tfm_id, self.additional_tfms[tfm_id])
+            if self.additional_tfms[tfm_id] is not None: #tfm_id != len(self.additional_tfms) - 1:
+                # print('applying' , tfm_id, self.additrional_tfms[tfm_id])
                 img = self.additional_tfms[tfm_id](np.array(img)) 
 
         img = self.transform(img)
 
-        art_style = self.pruned_style_class[index][0] - 1 ## -1 because the indexes start from 1 in the mat file.
-        genre = self.pruned_genre[index][0] ## Did not do -1 because its already from 0
-        artist = self.artist_to_label[self.pruned_artist[index][0]]
         inputs['img'] = img
-        inputs['art_style'] = art_style 
-        inputs['genre'] = genre
-        inputs['artist'] = artist
+        inputs['art_style'] = art_image.art_style_num 
+        inputs['genre'] = 0
+        inputs['artist'] = 0
 
         return inputs
 
     def __len__(self):
-        return len(self.pruned_genre)
+        return len(self.images)
 
     def name(self):
-        return 'wikiart_dataset_pruned'
-
+        return 'wikiart_dataset_HR'
 
 class WikiartImage:
     def __init__(self, image_name, art_style, path, art_style_num):

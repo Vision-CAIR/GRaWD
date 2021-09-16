@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import numpy as np
 
 import torchvision.transforms as transforms
+from model import Discriminator
 
 class DeNormalize(object):
     def __init__(self, mean, std):
@@ -114,7 +115,10 @@ def compute_protos(proto_files, key, module, dset, grad_proto, module_kwargs, ve
         with torch.no_grad():
             if key == 'pruned_style_class':
                 ### 10 images on single GPU.
-                _, features = module.module(input_batch, **module_kwargs)
+                if type(module) == Discriminator:
+                    _, features = module(input_batch, **module_kwargs)
+                else:
+                    _, features = module.module(input_batch, **module_kwargs)
         protos.append(features.mean(0)[None])
     return torch.cat(protos, dim=0)
 
@@ -226,9 +230,8 @@ class RWLoss(nn.Module):
         if verbose:
             print('computing protos')
 
-        if key not in self.protos:
-            protos = compute_protos(self.proto_examples[key], key, discriminator, dataset, self.opt.RW_grad_proto, module_kwargs)
-            self.protos[key] = protos
+        protos = compute_protos(self.proto_examples[key], key, discriminator, dataset, self.opt.RW_grad_proto, module_kwargs)
+        self.protos[key] = protos
 
         if verbose:
             print('protos shape ', protos.shape)

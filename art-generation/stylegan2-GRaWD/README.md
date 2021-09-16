@@ -10,7 +10,7 @@ I have tested on:
 
 ## Usage
 
-First download the wikiart dataset from [here.](https://www.dropbox.com/s/ssw0fdcdld50o1g/wikiartimages.zip/)
+First download the wikiart dataset from [here](https://www.dropbox.com/s/ssw0fdcdld50o1g/wikiartimages.zip/).
 
 Extract the data in the root directory.
 
@@ -33,9 +33,9 @@ python -m torch.distributed.launch --nproc_per_node=4 --master_port=12895 train.
 
 ## Samples
 
-![](sample/sample0.png )
-![](sample/sample12.png )
-![](sample/sample24.png )
+![](assets/sample/sample0.png )
+![](assets/sample/sample12.png )
+![](assets/sample/sample24.png )
 
 
 

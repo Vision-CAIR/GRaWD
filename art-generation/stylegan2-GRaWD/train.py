@@ -286,7 +286,8 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
                                     mode='creative',
                                     dataset=dataloader.dataset,
                                     key='pruned_style_class',
-                                    module_kwargs={'return_logits':False}
+                                    module_kwargs={'return_logits':False,
+                                                    'return_features':True}
                                     )
         else:
             fake_pred = discriminator(fake_img)
